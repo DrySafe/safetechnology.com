@@ -18,9 +18,10 @@ O servidor de desenvolvimento usa a porta 3000. O preview de produção usa a po
 ## Estrutura
 
 - `src/App.tsx`: conteúdo, seções, navegação e timelines de scroll.
-- `src/components/Scene.tsx`: cabeça biônica de perfil, chip e núcleo neural procedurais. Sem GLB, HDR ou texturas remotas.
-- `src/components/BionicHead.tsx`: placas curvas, perfil facial, mecanismos, ouvido com túnel aberto e projeção das legendas de humano + IA. A seção 03 acelera a câmera pelo ouvido enquanto as placas se abrem e giram. Movimento reduzido mantém a câmera estática e desativa o clarão de transição.
-- `src/components/headGeometry.ts`: superfícies anatômicas paramétricas, órbitas e pálpebras, painéis curvos e microtexturas locais para cerâmica e metal escovado. Iluminação de estúdio com sombras dinâmicas no módulo Scene.
+- `src/components/Scene.tsx`: composição 3D e travessia pelo interior da rede ao rolar a seção 03.
+- `src/components/NeuralBrain.tsx`: shaders de impulsos simultâneos, brilho localizado por hover/toque, pool limitado a 240 partículas e legendas ancoradas em 3D.
+- `src/components/neuralGeometry.ts`: 540 neurônios procedurais, hemisférios, cerebelo, tronco e conexões por proximidade. Sem modelos ou texturas externos.
+- `src/components/NeuralFallback.tsx`: representação SVG quando WebGL não está disponível.
 - `src/components/Interactions.tsx`: preloader, magnetismo, spotlight e cursor.
 - `src/components/Briefing.tsx`: modal acessível com briefing baixável.
 - `src/styles.css`: direção visual, responsividade e movimento reduzido.
@@ -37,7 +38,7 @@ O acesso ao ChatSafe foi bloqueado por HTTP 403 no proxy do ambiente durante a c
 
 ## Performance e acessibilidade
 
-Geometrias procedurais, DPR limitado a 1.5, ambiente de iluminação gerado localmente, carregamento separado do módulo 3D, fallback sem WebGL, fontes locais, layouts responsivos, suporte a prefers-reduced-motion, diálogo nativo e navegação por teclado. 60fps é uma meta; desempenho real depende do dispositivo/GPU e deve ser medido em hardware de destino.
+Geometrias procedurais, linhas e pontos agrupados em buffers, partículas recicladas, DPR limitado a 1.5, ambiente de iluminação gerado localmente, carregamento separado do módulo 3D, fallback sem WebGL, fontes locais, layouts responsivos, suporte a prefers-reduced-motion, diálogo nativo e navegação por teclado. 60fps é uma meta; desempenho real depende do dispositivo/GPU e deve ser medido em hardware de destino.
 
 ## Publicação
 
