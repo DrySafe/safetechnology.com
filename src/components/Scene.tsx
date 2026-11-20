@@ -3,6 +3,7 @@ import { Lightformer, Environment } from '@react-three/drei';
 import { Component, useRef, useEffect, useState, type ReactNode } from 'react';
 import * as THREE from 'three';
 import NeuralBrain, { FOCUS, qualities, type AnnotationRefs } from './NeuralBrain';
+import Processor from './Processor';
 import { NeuralFallback } from './NeuralFallback';
 
 class WebGLBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
@@ -32,7 +33,7 @@ function Core({ progress, reduced, annotations, container }: { progress: React.R
     } else {
       camera.position.set(0, 0, 6.7);camera.lookAt(0,0,0);
     }
-    const flash = reduced ? 0 : Math.max(0,1-Math.abs(p-.35)/.035)*.85;
+    const flash = reduced ? 0 : Math.max(0,1-Math.abs(p-.35)/.035)*.65;
     container.current?.style.setProperty('--portal-flash',String(flash));
     if(container.current)container.current.dataset.phase=p<.1?'network':p<.22?'approach':p<.35?'flight':p<.72?'processor':'neural';
     chip.current.visible = p > .34 && p < .76;
@@ -43,14 +44,7 @@ function Core({ progress, reduced, annotations, container }: { progress: React.R
     <group ref={profile}>
       <NeuralBrain progress={progress} reduced={reduced} annotations={annotations} container={container}/>
     </group>
-    <group ref={chip} visible={false}>
-      <mesh><boxGeometry args={[2.5, 2.5, .3]}/><meshStandardMaterial color="#303a32" metalness={.85} roughness={.24}/></mesh>
-      <mesh position={[0,0,.18]}><boxGeometry args={[1.65,1.65,.1]}/><meshStandardMaterial color="#baff6c" emissive="#6baf37" emissiveIntensity={.4} metalness={.7} roughness={.25}/></mesh>
-      <mesh position={[0,0,.26]}><boxGeometry args={[1.05,1.05,.08]}/><meshStandardMaterial color="#111b13" metalness={.7} roughness={.3}/></mesh>
-      <mesh position={[0,0,.31]}><boxGeometry args={[.75,.75,.025]}/><meshStandardMaterial color="#c7ff6b" emissive="#9bd45c" emissiveIntensity={.8} wireframe/></mesh>
-      {Array.from({length:7},(_,i)=><group key={`trace-${i}`}><mesh position={[-.6+i*.2,0,.245]}><boxGeometry args={[.012,1.55,.008]}/><meshStandardMaterial color="#d4f8ac" emissive="#c7ff6b" emissiveIntensity={.2}/></mesh><mesh position={[0,-.6+i*.2,.246]}><boxGeometry args={[1.55,.012,.008]}/><meshStandardMaterial color="#d4f8ac" emissive="#c7ff6b" emissiveIntensity={.2}/></mesh></group>)}
-      {Array.from({length:12},(_,i)=>[0,1,2,3].map(side=><mesh key={`${i}-${side}`} position={side<2 ? [-1.1+i*.2,side===0?1.4:-1.4,0] : [side===2?1.4:-1.4,-1.1+i*.2,0]} rotation={[0,0,side<2?0:Math.PI/2]}><boxGeometry args={[.07,.35,.08]}/><meshStandardMaterial color="#cad3b8" metalness={1} roughness={.25}/></mesh>))}
-    </group>
+    <group ref={chip} visible={false}><Processor/></group>
   </group>;
 }
 export default function Scene({ progress, reduced }: { progress: React.RefObject<number>; reduced: boolean }) {

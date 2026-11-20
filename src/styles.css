@@ -19,3 +19,6 @@ h1,h2,h3,.brand,.footer-call,.custom-visual{font-family:"Space Grotesk",Arial,sa
 @media(max-width:600px){.brain-quality{width:110px;padding:5px 0}.brain-quality>span{font-size:5px;letter-spacing:.5px}.brain-quality strong{font-size:9px}.brain-quality small{display:none}.brain-annotations path{stroke-width:.7}.hero-orbit{right:0;width:100%}.journey-scene{inset:40px 0 0}.journey-scene .brain-quality{padding:5px}.journey-scene .brain-annotations{display:block}}
 
 .portal-flash{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,#f0ffe7,#bfe8b4);opacity:var(--portal-flash,0);z-index:4}.journey-copy{opacity:var(--flight-copy,1)}.scene-container[data-phase="flight"] .brain-annotations,.scene-container[data-phase="approach"] .brain-annotations{pointer-events:none}.brain-annotations{z-index:3}
+
+/* Dark dissolve replaces the full-screen white flash. */
+.portal-flash{background:#050505}

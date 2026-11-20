@@ -16,7 +16,9 @@ vec3 deform(vec3 p){return p+vec3(sin(p.y*4.0+uTime*.7),cos(p.x*3.0+uTime*.8),si
 float activation(vec3 p){
  float a=pow(.5+.5*sin(uTime*2.2+p.x*3.4+p.y*1.7),4.0);
  float b=pow(.5+.5*sin(uTime*1.7-p.y*5.0+p.z*3.0+2.0),5.0);
- return max(a,b);
+ vec3 center=vec3(sin(uTime*.8)*1.2,cos(uTime*.65)*.8,0.);
+ float wave=exp(-dot(p-center,p-center)*4.);
+ return max(max(a,b),wave);
 }
 vec3 palette(vec3 p){
  vec3 gold=vec3(.8,1.,.4),violet=vec3(.62,.42,1.),pink=vec3(1.,.46,.58);
@@ -26,7 +28,7 @@ vec3 palette(vec3 p){
 const nodeVertex=common+`
 attribute float aSeed; varying vec3 vColor; varying float vEnergy;
 void main(){vec3 p=deform(position);float hover=exp(-dot(p-uHover,p-uHover)*4.)*uHoverStrength;
- vEnergy=.25+activation(p)*.8+hover*3.0;
+ vEnergy=.08+pow(activation(p),2.)*2.5+hover*3.0;
  vColor=mix(palette(p),vec3(1.,.98,.65),min(1.,hover));
  vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;
  gl_PointSize=clamp((13.+vEnergy*21.+aSeed*4.)*3.8/max(.4,-mv.z),3.,95.);
@@ -41,10 +43,10 @@ void main(){vPosition=deform(position);vTravel=aTravel;vSeed=aSeed;gl_Position=p
 const lineFragment=common+`varying float vTravel;varying float vSeed;varying vec3 vPosition;
 void main(){float signal=exp(-pow((vTravel-fract(uTime*1.1+vSeed))*17.,2.));
 float hover=exp(-dot(vPosition-uHover,vPosition-uHover)*4.)*uHoverStrength;
-float energy=.1+activation(vPosition)*.27+signal*.5+hover*1.25;
+float energy=.045+pow(activation(vPosition),2.)*.85+signal*.85+hover*1.25;
 gl_FragColor=vec4(mix(palette(vPosition),vec3(1.,1.,.7),signal*.6),energy);}`;
-const particleVertex=`attribute float aLife;varying float vLife;void main(){vLife=aLife;vec4 mv=modelViewMatrix*vec4(position,1.);gl_Position=projectionMatrix*mv;gl_PointSize=clamp((8.+aLife*20.)*3./max(.5,-mv.z),1.,60.);}`;
-const particleFragment=`varying float vLife;void main(){float r=length(gl_PointCoord-.5);float alpha=exp(-r*r*45.)*vLife;if(alpha<.01)discard;gl_FragColor=vec4(1.,.93,.48,alpha);}`;
+const particleVertex=`attribute float aLife;varying float vLife;void main(){vLife=aLife;vec4 mv=modelViewMatrix*vec4(position,1.);gl_Position=projectionMatrix*mv;gl_PointSize=clamp((18.+aLife*35.)*3./max(.5,-mv.z),1.,60.);}`;
+const particleFragment=`varying float vLife;void main(){vec2 p=gl_PointCoord-.5;float r=length(p);float core=exp(-r*r*180.);float trail=exp(-abs(p.x)*65.-abs(p.y)*9.);float halo=exp(-r*r*16.)*.22;float alpha=(core+trail*.7+halo)*smoothstep(0.,.3,vLife);if(alpha<.01)discard;gl_FragColor=vec4(1.,.70+.27*vLife,.22+.55*vLife,alpha);}`;
 const COUNT=240;
 
 export default function NeuralBrain({progress,reduced,annotations,container}:{progress:RefObject<number>;reduced:boolean;annotations:AnnotationRefs;container:RefObject<HTMLDivElement|null>}){
@@ -73,12 +75,12 @@ export default function NeuralBrain({progress,reduced,annotations,container}:{pr
     strength.current=reduced?(hovering.current?1:0):THREE.MathUtils.damp(strength.current,hovering.current?1:0,7,dt);
     uniforms.uTime.value=reduced?0:clock.elapsedTime;uniforms.uHover.value.copy(hover.current);uniforms.uHoverStrength.value=strength.current;
     let active=0;
-    if(hovering.current&&!reduced){emission.current+=dt*85;while(emission.current>=1){emission.current--;const i=cursor.current++%COUNT;pool.life[i]=1;
-      for(let axis=0;axis<3;axis++){pool.positions[i*3+axis]=hover.current.getComponent(axis)+(Math.random()-.5)*.2;pool.velocities[i*3+axis]=(Math.random()-.5)*1.25;}
+    if(hovering.current&&!reduced){emission.current+=dt*45;while(emission.current>=1){emission.current--;const i=cursor.current++%COUNT;pool.life[i]=1;
+      for(let axis=0;axis<3;axis++){pool.positions[i*3+axis]=hover.current.getComponent(axis)+(Math.random()-.5)*.2;pool.velocities[i*3+axis]=(Math.random()-.5)*.34;}
     }}
-    for(let i=0;i<COUNT;i++){if(pool.life[i]<=0)continue;pool.life[i]=Math.max(0,pool.life[i]-dt*.8);if(reduced){pool.life[i]=0;continue}active++;
+    for(let i=0;i<COUNT;i++){if(pool.life[i]<=0)continue;pool.life[i]=Math.max(0,pool.life[i]-dt*.34);if(reduced){pool.life[i]=0;continue}active++;
       for(let axis=0;axis<3;axis++)pool.positions[i*3+axis]+=pool.velocities[i*3+axis]*dt;
-      pool.velocities[i*3+1]+=dt*.15;
+      pool.velocities[i*3+1]-=dt*.035;
     }
     pool.geometry.attributes.position.needsUpdate=true;pool.geometry.attributes.aLife.needsUpdate=true;
     if(container.current){container.current.dataset.neuralHover=hovering.current?'active':'idle';container.current.dataset.particles=String(active);container.current.dataset.neuralIntensity=strength.current.toFixed(2);}
