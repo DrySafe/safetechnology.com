@@ -16,13 +16,13 @@ assert.equal(await heroQuality.count(),3);
 assert.equal(await heroQuality.first().innerText(), '01 / HUMANO × IA\nEmpatia + precisão\nSensibilidade humana. Inteligência aplicada.');
 for(const box of await heroQuality.all()) {
   const bounds=await box.boundingBox();
-  assert.ok(bounds && bounds.x>=0 && bounds.x+bounds.width<=1440, 'Brain labels fit the viewport');
+  assert.ok(bounds && bounds.x>=0 && bounds.x+bounds.width<=1440, 'Head labels fit the viewport');
 }
 const leader=page.locator('.hero-orbit .brain-annotations path').first();
 const initialPath=await leader.getAttribute('d');
 await page.mouse.move(1100,400);
 await page.waitForTimeout(450);
-assert.notEqual(await leader.getAttribute('d'),initialPath,'Leader follows the animated cortex');
+assert.notEqual(await leader.getAttribute('d'),initialPath,'Leader follows the animated head');
 assert.ok(!(await leader.getAttribute('d')).includes('NaN'));
 
 await page.screenshot({path:'test-results/desktop.png'});
@@ -39,12 +39,16 @@ assert.equal(await page.locator('dialog').count(),0);
 await page.evaluate(()=>document.querySelector('#solucoes').scrollIntoView());
 await page.waitForTimeout(1200);
 await page.screenshot({path:'test-results/solutions.png'});
-await page.evaluate(()=>document.querySelector('.journey').scrollIntoView());
-await page.waitForTimeout(300);
-await page.screenshot({path:'test-results/brain-journey.png'});
-await page.mouse.wheel(0,1100);
-await page.waitForTimeout(2000);
-await page.screenshot({path:'test-results/journey.png'});
+const journeyStart=await page.locator('.journey').evaluate(el=>el.parentElement.getBoundingClientRect().top+scrollY);
+for(const [fraction,phase] of [[0,'profile'],[.18,'approach'],[.30,'flight'],[.50,'processor'],[0,'profile']]) {
+  await page.evaluate(y=>window.scrollTo(0,y),journeyStart+fraction*2200);
+  await page.waitForTimeout(900);
+  assert.equal(await page.locator('.journey .scene-container').getAttribute('data-phase'),phase);
+  await page.screenshot({path:`test-results/head-${phase}.png`});
+  if(phase==='flight')assert.equal(await page.locator('.journey .brain-quality').first().evaluate(el=>getComputedStyle(el).visibility),'hidden');
+}
+await page.evaluate(y=>window.scrollTo(0,y),journeyStart+1100);
+await page.waitForTimeout(1200);
 assert.ok(await page.getByRole('heading',{name:/Menos tarefas/}).count());
 assert.equal(await page.locator('.journey .brain-quality').first().evaluate(el=>getComputedStyle(el).visibility),'hidden');
 await page.mouse.wheel(0,750);

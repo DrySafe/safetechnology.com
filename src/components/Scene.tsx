@@ -2,28 +2,39 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { MeshDistortMaterial, Lightformer, Environment } from '@react-three/drei';
 import { Component, useRef, useEffect, useState, type ReactNode } from 'react';
 import * as THREE from 'three';
-import BionicBrain, { qualities, type AnnotationRefs } from './BionicBrain';
-import { BrainFallback } from './BrainFallback';
+import BionicHead, { EAR, qualities, type AnnotationRefs } from './BionicHead';
+import { HeadFallback } from './HeadFallback';
 
 class WebGLBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() { return { failed: true }; }
-  render() { return this.state.failed ? <BrainFallback/> : this.props.children; }
+  render() { return this.state.failed ? <HeadFallback/> : this.props.children; }
 }
-function Core({ progress, reduced, annotations }: { progress: React.RefObject<number>; reduced: boolean; annotations: AnnotationRefs }) {
+function Core({ progress, reduced, annotations, container }: { progress: React.RefObject<number>; reduced: boolean; annotations: AnnotationRefs; container: React.RefObject<HTMLDivElement | null> }) {
   const group = useRef<THREE.Group>(null!);
-  const cortex = useRef<THREE.Group>(null!);
+  const profile = useRef<THREE.Group>(null!);
   const chip = useRef<THREE.Group>(null!);
   const brain = useRef<THREE.Group>(null!);
-  useFrame(({ clock, pointer }, delta) => {
+  useFrame(({ clock, pointer, camera }, delta) => {
     const p = progress.current;
     const t = reduced ? 0 : clock.elapsedTime;
-    group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, pointer.x * .25, 3, delta);
-    group.current.rotation.x = THREE.MathUtils.damp(group.current.rotation.x, -pointer.y * .15, 3, delta);
-    cortex.current.rotation.set(.1 + Math.sin(t * .3) * .04, -.22 + Math.sin(t * .2) * .15, -.06);
-    const zoom = p < .34 ? 1 + p * 12 : Math.max(.001, 5 - (p - .34) * 55);
-    cortex.current.scale.setScalar(zoom);
-    cortex.current.visible = p < .44;
+    const flight = reduced ? 0 : THREE.MathUtils.clamp((p - .1) / .23, 0, 1);
+    const approach = THREE.MathUtils.smoothstep(flight, 0, .45);
+    const travel = flight * flight * flight;
+    const input = p < .1 ? 1 : 0;
+    group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, pointer.x * .12 * input, 5, delta);
+    group.current.rotation.x = THREE.MathUtils.damp(group.current.rotation.x, -pointer.y * .07 * input, 5, delta);
+    profile.current.rotation.set(0, 0, 0);
+    profile.current.visible = p < .36;
+    if (p < .35 && !reduced) {
+      camera.position.set(EAR.x * approach, EAR.y * approach, 6.7 - travel * 15);
+      camera.lookAt(EAR.x * approach, EAR.y * approach, camera.position.z - 5);
+    } else {
+      camera.position.set(0, 0, 6.7);camera.lookAt(0,0,0);
+    }
+    const flash = reduced ? 0 : Math.max(0,1-Math.abs(p-.35)/.035)*.85;
+    container.current?.style.setProperty('--portal-flash',String(flash));
+    if(container.current)container.current.dataset.phase=p<.1?'profile':p<.22?'approach':p<.35?'flight':p<.72?'processor':'neural';
     chip.current.visible = p > .34 && p < .76;
     chip.current.scale.setScalar(Math.max(.001, Math.min(1.2, (p - .34) * 12) + Math.max(0, p - .6) * 22));
     chip.current.rotation.set(.4 + Math.sin(t * .3) * .08, -.45 + t * .06, -.15);
@@ -32,8 +43,8 @@ function Core({ progress, reduced, annotations }: { progress: React.RefObject<nu
     brain.current.rotation.y = t * .12;
   });
   return <group ref={group}>
-    <group ref={cortex}>
-      <BionicBrain progress={progress} reduced={reduced} annotations={annotations}/>
+    <group ref={profile}>
+      <BionicHead progress={progress} reduced={reduced} annotations={annotations}/>
     </group>
     <group ref={chip} visible={false}>
       <mesh><boxGeometry args={[2.5, 2.5, .3]}/><meshStandardMaterial color="#303a32" metalness={.85} roughness={.24}/></mesh>
@@ -55,15 +66,15 @@ export default function Scene({ progress, reduced }: { progress: React.RefObject
   const annotations: AnnotationRefs = { paths: useRef([]), labels: useRef([]), dots: useRef([]) };
   const [visible,setVisible] = useState(true);
   useEffect(()=>{const observer=new IntersectionObserver(([entry])=>setVisible(entry.isIntersecting),{rootMargin:'100px'});if(container.current)observer.observe(container.current);return()=>observer.disconnect();},[]);
-  return <div ref={container} className="scene-container"><WebGLBoundary><Canvas frameloop={visible ? (reduced ? 'demand' : 'always') : 'never'} dpr={[1,1.5]} camera={{position:[0,0,6.7],fov:45}} gl={{antialias:true,alpha:true,powerPreference:'high-performance'}} fallback={<BrainFallback/>} aria-hidden="true">
+  return <div ref={container} className="scene-container"><WebGLBoundary><Canvas frameloop={visible ? (reduced ? 'demand' : 'always') : 'never'} dpr={[1,1.5]} camera={{position:[0,0,6.7],fov:45}} gl={{antialias:true,alpha:true,powerPreference:'high-performance'}} fallback={<HeadFallback/>} aria-hidden="true">
     <ambientLight intensity={.3}/><directionalLight position={[3,4,5]} intensity={3} color="#e3ffc8"/>
     <Environment resolution={128}>
       <Lightformer intensity={4} position={[0,4,2]} scale={[10,3,1]}/>
-      <Lightformer intensity={5} color="#c7ff6b" position={[-4,0,1]} rotation={[0,Math.PI/2,0]} scale={[6,5,1]}/>
-      <Lightformer intensity={4} color="#aea5ff" position={[4,-1,1]} rotation={[0,-Math.PI/2,0]} scale={[4,7,1]}/>
+      <Lightformer intensity={3} color="#d7e8df" position={[-4,0,1]} rotation={[0,Math.PI/2,0]} scale={[6,5,1]}/>
+      <Lightformer intensity={3} color="#adc9dc" position={[4,-1,1]} rotation={[0,-Math.PI/2,0]} scale={[4,7,1]}/>
     </Environment>
-    <Core progress={progress} reduced={reduced} annotations={annotations}/>
-  </Canvas></WebGLBoundary>
+    <Core progress={progress} reduced={reduced} annotations={annotations} container={container}/>
+  </Canvas></WebGLBoundary><div className="portal-flash" aria-hidden="true"/>
     <div className="brain-annotations" aria-label="Qualidades da união entre pessoas e tecnologia">
       <svg viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true">
         {qualities.map((q,i)=><g key={q.title}><path ref={el=>{annotations.paths.current[i]=el}}/><circle r="4" ref={el=>{annotations.dots.current[i]=el}}/></g>)}
