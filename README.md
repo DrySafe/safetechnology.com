@@ -20,6 +20,7 @@ O servidor de desenvolvimento usa a porta 3000. O preview de produção usa a po
 - `src/App.tsx`: conteúdo, seções, navegação e timelines de scroll.
 - `src/components/Scene.tsx`: cabeça biônica de perfil, chip e núcleo neural procedurais. Sem GLB, HDR ou texturas remotas.
 - `src/components/BionicHead.tsx`: placas curvas, perfil facial, mecanismos, ouvido com túnel aberto e projeção das legendas de humano + IA. A seção 03 acelera a câmera pelo ouvido enquanto as placas se abrem e giram. Movimento reduzido mantém a câmera estática e desativa o clarão de transição.
+- `src/components/headGeometry.ts`: superfícies anatômicas paramétricas, órbitas e pálpebras, painéis curvos e microtexturas locais para cerâmica e metal escovado. Iluminação de estúdio com sombras dinâmicas no módulo Scene.
 - `src/components/Interactions.tsx`: preloader, magnetismo, spotlight e cursor.
 - `src/components/Briefing.tsx`: modal acessível com briefing baixável.
 - `src/styles.css`: direção visual, responsividade e movimento reduzido.

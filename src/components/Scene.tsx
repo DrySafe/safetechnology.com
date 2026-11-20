@@ -22,7 +22,7 @@ function Core({ progress, reduced, annotations, container }: { progress: React.R
     const approach = THREE.MathUtils.smoothstep(flight, 0, .45);
     const travel = flight * flight * flight;
     const input = p < .1 ? 1 : 0;
-    group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, pointer.x * .12 * input, 5, delta);
+    group.current.rotation.y = THREE.MathUtils.damp(group.current.rotation.y, (-.25 + pointer.x * .12) * input, 5, delta);
     group.current.rotation.x = THREE.MathUtils.damp(group.current.rotation.x, -pointer.y * .07 * input, 5, delta);
     profile.current.rotation.set(0, 0, 0);
     profile.current.visible = p < .36;
@@ -66,12 +66,14 @@ export default function Scene({ progress, reduced }: { progress: React.RefObject
   const annotations: AnnotationRefs = { paths: useRef([]), labels: useRef([]), dots: useRef([]) };
   const [visible,setVisible] = useState(true);
   useEffect(()=>{const observer=new IntersectionObserver(([entry])=>setVisible(entry.isIntersecting),{rootMargin:'100px'});if(container.current)observer.observe(container.current);return()=>observer.disconnect();},[]);
-  return <div ref={container} className="scene-container"><WebGLBoundary><Canvas frameloop={visible ? (reduced ? 'demand' : 'always') : 'never'} dpr={[1,1.5]} camera={{position:[0,0,6.7],fov:45}} gl={{antialias:true,alpha:true,powerPreference:'high-performance'}} fallback={<HeadFallback/>} aria-hidden="true">
-    <ambientLight intensity={.3}/><directionalLight position={[3,4,5]} intensity={3} color="#e3ffc8"/>
-    <Environment resolution={128}>
-      <Lightformer intensity={4} position={[0,4,2]} scale={[10,3,1]}/>
-      <Lightformer intensity={3} color="#d7e8df" position={[-4,0,1]} rotation={[0,Math.PI/2,0]} scale={[6,5,1]}/>
-      <Lightformer intensity={3} color="#adc9dc" position={[4,-1,1]} rotation={[0,-Math.PI/2,0]} scale={[4,7,1]}/>
+  return <div ref={container} className="scene-container"><WebGLBoundary><Canvas shadows frameloop={visible ? (reduced ? 'demand' : 'always') : 'never'} dpr={[1,1.5]} camera={{position:[0,0,6.7],fov:45}} gl={{antialias:true,alpha:true,powerPreference:'high-performance'}} fallback={<HeadFallback/>} aria-hidden="true">
+    <ambientLight intensity={.12}/>
+    <directionalLight position={[-3,5,6]} intensity={3} color="#f0f3ff" castShadow shadow-mapSize={[1024,1024]} shadow-bias={-.0003} shadow-normalBias={.025} shadow-camera-left={-3} shadow-camera-right={3} shadow-camera-top={3} shadow-camera-bottom={-3}/>
+    <directionalLight position={[4,1,-2]} intensity={2.2} color="#a8c4e0"/>
+    <Environment resolution={256}>
+      <Lightformer intensity={3} position={[-3,4,4]} rotation={[0,.4,0]} scale={[2,5,1]}/>
+      <Lightformer intensity={1.3} color="#d7e0e8" position={[4,0,2]} rotation={[0,-Math.PI/3,0]} scale={[1,4,1]}/>
+      <Lightformer intensity={2} position={[0,4,-2]} rotation={[Math.PI/2,0,0]} scale={[5,1,1]}/>
     </Environment>
     <Core progress={progress} reduced={reduced} annotations={annotations} container={container}/>
   </Canvas></WebGLBoundary><div className="portal-flash" aria-hidden="true"/>
