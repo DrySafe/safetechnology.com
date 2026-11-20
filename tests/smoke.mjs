@@ -11,6 +11,20 @@ await page.waitForTimeout(2300);
 await assert.doesNotReject(()=>page.getByRole('heading',{level:1,name:/O futuro/}).waitFor());
 await page.locator('canvas').nth(1).waitFor({state:'attached'});
 assert.equal(await page.locator('canvas').count(),2);
+const heroQuality=page.locator('.hero-orbit .brain-quality');
+assert.equal(await heroQuality.count(),3);
+assert.equal(await heroQuality.first().innerText(), '01 / HUMANO × IA\nEmpatia + precisão\nSensibilidade humana. Inteligência aplicada.');
+for(const box of await heroQuality.all()) {
+  const bounds=await box.boundingBox();
+  assert.ok(bounds && bounds.x>=0 && bounds.x+bounds.width<=1440, 'Brain labels fit the viewport');
+}
+const leader=page.locator('.hero-orbit .brain-annotations path').first();
+const initialPath=await leader.getAttribute('d');
+await page.mouse.move(1100,400);
+await page.waitForTimeout(450);
+assert.notEqual(await leader.getAttribute('d'),initialPath,'Leader follows the animated cortex');
+assert.ok(!(await leader.getAttribute('d')).includes('NaN'));
+
 await page.screenshot({path:'test-results/desktop.png'});
 await page.getByRole('button',{name:'Vamos conversar',exact:true}).click();
 await page.getByLabel('Seu nome',{exact:true}).fill('Teste Safe');
@@ -27,10 +41,12 @@ await page.waitForTimeout(1200);
 await page.screenshot({path:'test-results/solutions.png'});
 await page.evaluate(()=>document.querySelector('.journey').scrollIntoView());
 await page.waitForTimeout(300);
+await page.screenshot({path:'test-results/brain-journey.png'});
 await page.mouse.wheel(0,1100);
 await page.waitForTimeout(2000);
 await page.screenshot({path:'test-results/journey.png'});
 assert.ok(await page.getByRole('heading',{name:/Menos tarefas/}).count());
+assert.equal(await page.locator('.journey .brain-quality').first().evaluate(el=>getComputedStyle(el).visibility),'hidden');
 await page.mouse.wheel(0,750);
 await page.waitForTimeout(1800);
 assert.ok(await page.getByRole('heading',{name:/Artificial na tecnologia/}).count());

@@ -18,7 +18,8 @@ O servidor de desenvolvimento usa a porta 3000. O preview de produção usa a po
 ## Estrutura
 
 - `src/App.tsx`: conteúdo, seções, navegação e timelines de scroll.
-- `src/components/Scene.tsx`: portal metálico, chip e núcleo neural procedurais. Sem GLB, HDR ou texturas remotas.
+- `src/components/Scene.tsx`: cérebro biônico, chip e núcleo neural procedurais. Sem GLB, HDR ou texturas remotas.
+- `src/components/BionicBrain.tsx`: hemisférios, córtex procedural, circuitos pulsantes e projeção das legendas de humano + IA.
 - `src/components/Interactions.tsx`: preloader, magnetismo, spotlight e cursor.
 - `src/components/Briefing.tsx`: modal acessível com briefing baixável.
 - `src/styles.css`: direção visual, responsividade e movimento reduzido.
