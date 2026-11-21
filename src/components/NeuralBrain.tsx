@@ -61,7 +61,7 @@ export default function NeuralBrain({progress,reduced,annotations,container}:{pr
     return {positions,velocities,life,geometry};
   },[]);
   function point(event:ThreeEvent<PointerEvent>){
-    if(progress.current>=.12&&progress.current<.72)return;event.stopPropagation();
+    if(progress.current>=.12)return;event.stopPropagation();
     const hit=root.current.worldToLocal(event.point.clone());
     let closest=network.nodes[0],distance=Infinity;
     for(const node of network.nodes){const d=node.distanceToSquared(hit);if(d<distance){closest=node;distance=d}}
@@ -70,7 +70,7 @@ export default function NeuralBrain({progress,reduced,annotations,container}:{pr
   function leave(){hovering.current=false;invalidate()}
   useFrame(({clock,camera,size},delta)=>{
     const dt=Math.min(delta,.05),p=progress.current;
-    const enabled=p<.12||p>=.72;
+    const enabled=p<.12;
     if(!enabled)hovering.current=false;
     strength.current=reduced?(hovering.current?1:0):THREE.MathUtils.damp(strength.current,hovering.current?1:0,7,dt);
     uniforms.uTime.value=reduced?0:clock.elapsedTime;uniforms.uHover.value.copy(hover.current);uniforms.uHoverStrength.value=strength.current;
