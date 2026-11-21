@@ -23,5 +23,5 @@ export function createNeuralNetwork(){
   const lineGeometry=new THREE.BufferGeometry(),positions:number[]=[],phases:number[]=[],seeds:number[]=[];
   for(let i=0;i<edges.length;i+=2){positions.push(...nodes[edges[i]].toArray(),...nodes[edges[i+1]].toArray());phases.push(0,1);const s=random();seeds.push(s,s)}
   lineGeometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));lineGeometry.setAttribute('aTravel',new THREE.Float32BufferAttribute(phases,1));lineGeometry.setAttribute('aSeed',new THREE.Float32BufferAttribute(seeds,1));
-  return {nodes,nodeGeometry,lineGeometry};
+  return {nodes,edges,nodeGeometry,lineGeometry};
 }

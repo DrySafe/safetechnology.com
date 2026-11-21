@@ -1,6 +1,7 @@
 import { useMemo, useRef, type RefObject } from 'react';
 import { useFrame, useThree, type ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
+import NeuralSignals from './NeuralSignals';
 import { createNeuralNetwork } from './neuralGeometry';
 
 export const FOCUS=new THREE.Vector3(0,.15,0);
@@ -28,7 +29,7 @@ vec3 palette(vec3 p){
 const nodeVertex=common+`
 attribute float aSeed; varying vec3 vColor; varying float vEnergy;
 void main(){vec3 p=deform(position);float hover=exp(-dot(p-uHover,p-uHover)*4.)*uHoverStrength;
- vEnergy=.08+pow(activation(p),2.)*2.5+hover*3.0;
+ vEnergy=.10+pow(activation(p),2.)*.85+hover*3.0;
  vColor=mix(palette(p),vec3(1.,.98,.65),min(1.,hover));
  vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;
  gl_PointSize=clamp((13.+vEnergy*21.+aSeed*4.)*3.8/max(.4,-mv.z),3.,95.);
@@ -43,7 +44,7 @@ void main(){vPosition=deform(position);vTravel=aTravel;vSeed=aSeed;gl_Position=p
 const lineFragment=common+`varying float vTravel;varying float vSeed;varying vec3 vPosition;
 void main(){float signal=exp(-pow((vTravel-fract(uTime*1.1+vSeed))*17.,2.));
 float hover=exp(-dot(vPosition-uHover,vPosition-uHover)*4.)*uHoverStrength;
-float energy=.045+pow(activation(vPosition),2.)*.85+signal*.85+hover*1.25;
+float energy=.045+pow(activation(vPosition),2.)*.22+signal*.22+hover*1.25;
 gl_FragColor=vec4(mix(palette(vPosition),vec3(1.,1.,.7),signal*.6),energy);}`;
 const particleVertex=`attribute float aLife;varying float vLife;void main(){vLife=aLife;vec4 mv=modelViewMatrix*vec4(position,1.);gl_Position=projectionMatrix*mv;gl_PointSize=clamp((18.+aLife*35.)*3./max(.5,-mv.z),1.,60.);}`;
 const particleFragment=`varying float vLife;void main(){vec2 p=gl_PointCoord-.5;float r=length(p);float core=exp(-r*r*180.);float trail=exp(-abs(p.x)*65.-abs(p.y)*9.);float halo=exp(-r*r*16.)*.22;float alpha=(core+trail*.7+halo)*smoothstep(0.,.3,vLife);if(alpha<.01)discard;gl_FragColor=vec4(1.,.70+.27*vLife,.22+.55*vLife,alpha);}`;
@@ -94,6 +95,7 @@ export default function NeuralBrain({progress,reduced,annotations,container}:{pr
     });
   });
   return <group ref={root}>
+    <NeuralSignals nodes={network.nodes} edges={network.edges} reduced={reduced} container={container}/>
     <lineSegments geometry={network.lineGeometry}><shaderMaterial uniforms={uniforms} vertexShader={lineVertex} fragmentShader={lineFragment} transparent depthWrite={false} blending={THREE.AdditiveBlending}/></lineSegments>
     <points geometry={network.nodeGeometry}><shaderMaterial uniforms={uniforms} vertexShader={nodeVertex} fragmentShader={nodeFragment} transparent depthWrite={false} blending={THREE.AdditiveBlending}/></points>
     <points geometry={pool.geometry} frustumCulled={false}><shaderMaterial vertexShader={particleVertex} fragmentShader={particleFragment} transparent depthWrite={false} blending={THREE.AdditiveBlending}/></points>

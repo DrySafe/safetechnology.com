@@ -22,6 +22,7 @@ O servidor de desenvolvimento usa a porta 3000. O preview de produção usa a po
 - `src/components/NeuralBrain.tsx`: shaders de impulsos simultâneos, brilho localizado por hover/toque, pool limitado a 240 partículas e legendas ancoradas em 3D.
 - `src/components/Processor.tsx`: encapsulamento arredondado, metal escovado procedural, contatos dourados e iluminação dedicada. A transição usa escurecimento, sem flash branco.
 - `src/components/neuralGeometry.ts`: 540 neurônios procedurais, hemisférios, cerebelo, tronco e conexões por proximidade. Sem modelos ou texturas externos.
+- `src/components/NeuralSignals.tsx`: 28 luzes autônomas percorrem arestas reais, escolhem um vizinho aleatório ao chegar e deixam um rastro curto. Movimento reduzido desativa esses deslocamentos.
 - `src/components/NeuralFallback.tsx`: representação SVG quando WebGL não está disponível.
 - `src/components/Interactions.tsx`: preloader, magnetismo, spotlight e cursor.
 - `src/components/Briefing.tsx`: modal acessível com briefing baixável.
