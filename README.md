@@ -33,6 +33,8 @@ O servidor de desenvolvimento usa a porta 3000. O preview de produção usa a po
 
 Com o servidor rodando, `npm test` executa testes de navegador em Chromium instalado em `/usr/bin/chromium`. Os screenshots ficam em `test-results/` (ignorado pelo Git). Para outros ambientes, ajuste o executável no teste ou use o Chromium do Playwright.
 
+`npm run test:responsive` verifica telas de 320, 390 e 768 px e celular na horizontal: etapas do zoom, gesto de rolagem sobre o canvas, largura dos cards e acesso ao rodapé. No mobile, a seção 03 usa `position: sticky` em uma faixa de rolagem nativa; no desktop, mantém o pin do ScrollTrigger.
+
 ## Limites da demonstração
 
 O briefing é gerado localmente em um arquivo TXT. Nenhum dado é enviado ou persistido. Antes de publicar como canal de contato, configure um destino real e uma integração de envio, proteção contra abuso e política de privacidade adequada. Os links do ChatSafe apontam para https://chatsafe.chat. A conversa mostrada é ilustrativa; não é uma integração com o produto. Não foram inventados clientes, métricas ou depoimentos.

@@ -25,3 +25,54 @@ h1,h2,h3,.brand,.footer-call,.custom-visual{font-family:"Space Grotesk",Arial,sa
 
 .human-connection{position:absolute;inset:0;pointer-events:none;opacity:0;transform:scale(1.06);transition:opacity .8s ease,transform 1.5s ease;overflow:hidden}.human-connection.active{opacity:1;transform:scale(1)}.human-connection img{width:100%;height:100%;object-fit:cover;object-position:60% center;mask-image:linear-gradient(90deg,transparent 0%,#000 45%,#000 100%)}.journey[data-stage="2"] .journey-copy{width:51%;text-shadow:0 2px 28px #000}.journey[data-stage="2"] .journey-copy h2{font-size:clamp(38px,4.5vw,65px)}
 @media(max-width:600px){.human-connection{inset:70px 0 auto;height:57%}.human-connection img{object-fit:cover;object-position:61% center;mask-image:linear-gradient(0deg,transparent,#000 25%,#000 90%,transparent)}.journey[data-stage="2"] .journey-copy{top:auto;bottom:100px;width:90%}.journey[data-stage="2"] .journey-copy h2{font-size:35px}}
+
+/* Keep touch scrolling native: the viewport sticks inside its own scroll track. */
+@media (max-width:899px) {
+ .journey-scroll{height:calc(100svh + 2200px)}
+ .journey{position:sticky;top:0;height:100svh;min-height:0}
+ .journey-scene{inset:65px 0 auto;height:54%}
+ .journey-copy,.journey[data-stage="2"] .journey-copy{top:auto;bottom:80px;left:6%;width:88%}
+ .journey-copy h2,.journey[data-stage="2"] .journey-copy h2{font-size:clamp(28px,7.5vw,48px);letter-spacing:-1.5px;margin:16px 0}
+ .journey-copy p{max-width:420px;font-size:12px}
+ .journey-bottom{bottom:25px}
+ .human-connection{inset:65px 0 auto;height:54%}
+ .human-connection img{object-position:61% center;mask-image:linear-gradient(0deg,transparent,#000 25%,#000 90%,transparent)}
+ .showcase-track{grid-template-columns:minmax(0,1fr)}
+ .showcase-track>*{min-width:0}
+ .showcase-intro h2 br{display:initial}
+ .project{height:auto;min-width:0}
+ .project-preview{overflow:visible;padding:25px;flex-wrap:wrap;gap:25px}
+ .project-preview>*{min-width:0}
+ .project-preview .chat-mock{max-width:100%;margin:0;transform:none;align-self:center}
+ .project-custom .custom-visual{min-height:300px}
+ .project-bottom{flex-shrink:0}
+ .project-bottom>span:first-child{min-width:0}
+ .circle-arrow{flex-shrink:0}
+ .bento,.essence-layout,.essence-copy,.process-grid,.faq{min-width:0}
+ .bento>*,.essence-layout>*,.essence-copy>*,.process-grid>*,.faq>*{min-width:0}
+}
+@media (max-width:600px) {
+ .showcase-intro h2{font-size:clamp(38px,11vw,47px)}
+ .spotlight{padding:24px}
+ .bento-chat{padding-bottom:15px}
+ .custom-visual>span{font-size:clamp(40px,12vw,53px)}
+ .footer-call{font-size:clamp(40px,11.8vw,56px);letter-spacing:-2px}
+ .footer-arrow{width:clamp(45px,15vw,60px);height:clamp(45px,15vw,60px)}
+ .footer-call>div{flex-shrink:0}
+ .header-cta{margin-right:10px}
+ .header-cta .button{gap:5px}
+ .hero-eyebrow{letter-spacing:.7px}
+ .section h2{font-size:clamp(30px,9.5vw,37px)}
+}
+@media (max-width:899px) and (max-height:550px) and (orientation:landscape) {
+ .journey-scene{inset:45px 0 45px 42%;height:auto}
+ .human-connection{inset:45px 0 45px 35%;height:auto}
+ .journey-copy,.journey[data-stage="2"] .journey-copy{width:49%;bottom:65px}
+ .journey-copy h2,.journey[data-stage="2"] .journey-copy h2{font-size:30px}
+ .journey-copy p{font-size:11px}
+ .journey-top{top:15px;padding-bottom:12px}
+}
+@media (max-width:899px) and (prefers-reduced-motion:reduce) {
+ .journey-scroll{height:auto}
+ .journey{position:relative;height:1100px}
+}
