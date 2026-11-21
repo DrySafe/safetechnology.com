@@ -1,5 +1,5 @@
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Lightformer, Environment, MeshDistortMaterial } from '@react-three/drei';
+import { Lightformer, Environment } from '@react-three/drei';
 import { Component, useRef, useEffect, useState, type ReactNode } from 'react';
 import * as THREE from 'three';
 import NeuralBrain, { FOCUS, qualities, type AnnotationRefs } from './NeuralBrain';
@@ -14,7 +14,6 @@ class WebGLBoundary extends Component<{ children: ReactNode }, { failed: boolean
 function Core({ progress, reduced, annotations, container }: { progress: React.RefObject<number>; reduced: boolean; annotations: AnnotationRefs; container: React.RefObject<HTMLDivElement | null> }) {
   const group = useRef<THREE.Group>(null!);
   const profile = useRef<THREE.Group>(null!);
-  const brain = useRef<THREE.Group>(null!);
   const chip = useRef<THREE.Group>(null!);
   useFrame(({ clock, pointer, camera }, delta) => {
     const p = progress.current;
@@ -40,20 +39,12 @@ function Core({ progress, reduced, annotations, container }: { progress: React.R
     chip.current.visible = p > .34 && p < .76;
     chip.current.scale.setScalar(Math.max(.001, Math.min(1.2, (p - .34) * 12) + Math.max(0, p - .6) * 22));
     chip.current.rotation.set(.4 + Math.sin(t * .3) * .08, -.45 + t * .06, -.15);
-    brain.current.visible = p >= .7;
-    brain.current.scale.setScalar(Math.max(.001, Math.min(1.4, (p - .7) * 9)));
-    brain.current.rotation.y = t * .12;
   });
   return <group ref={group}>
     <group ref={profile}>
       <NeuralBrain progress={progress} reduced={reduced} annotations={annotations} container={container}/>
     </group>
     <group ref={chip} visible={false}><Processor/></group>
-    <group ref={brain} visible={false}>
-      <mesh scale={[1.2,1,.85]}><icosahedronGeometry args={[1.3,2]}/><meshStandardMaterial color="#b9ef85" wireframe transparent opacity={.45}/></mesh>
-      {Array.from({length:42},(_,i)=>{const y=1-(i/41)*2, r=Math.sqrt(1-y*y), a=i*2.39996; return <mesh key={i} position={[Math.cos(a)*r*1.56,y*1.3,Math.sin(a)*r*1.1]}><sphereGeometry args={[.045,8,8]}/><meshBasicMaterial color="#ceff98"/></mesh>})}
-      <mesh><sphereGeometry args={[.65,32,32]}/><MeshDistortMaterial color="#718568" metalness={1} roughness={.2} distort={.4} speed={reduced?0:2}/></mesh>
-    </group>
   </group>;
 }
 export default function Scene({ progress, reduced }: { progress: React.RefObject<number>; reduced: boolean }) {
